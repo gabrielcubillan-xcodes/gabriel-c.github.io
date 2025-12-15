@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel Cubillan | Quality Engineer</title>
+    <style>
+        :root {
+            --primary: #0a192f; /* Deep Navy */
+            --secondary: #64ffda; /* Tech Green */
+            --text-light: #8892b0;
+            --text-white: #e6f1ff;
+            --card-bg: #112240;
+            --accent: #f77f00; /* Orange for emphasis */
+        }
+ 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+ 
+        body {
+            background-color: var(--primary);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+ 
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 50px;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            background-color: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        }
+ 
+        .logo {
+            color: var(--secondary);
+            font-weight: bold;
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+        }
+ 
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 100px;
+        }
+ 
+        .hero h1 {
+            color: var(--text-white);
+            font-size: 4rem;
+            margin-bottom: 10px;
+        }
+ 
+        .hero h2 {
+            color: var(--text-light);
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+ 
+        .hero .terminal-text {
+            color: var(--secondary);
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+ 
+        .cta-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            width: fit-content;
+            margin-top: 20px;
+        }
+ 
+        .cta-btn:hover {
+            background-color: rgba(100, 255, 218, 0.1);
+            transform: translateY(-3px);
+        }
+ 
+        /* --- SECTIONS --- */
+        section {
+            padding: 80px 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+ 
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            color: var(--text-white);
+        }
+ 
+        .section-title::after {
+            content: "";
+            display: block;
+            width: 200px;
+            height: 1px;
+            background-color: var(--text-light);
+            margin-left: 20px;
+            opacity: 0.3;
+        }
+ 
+        /* --- SKILLS GRID --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+ 
+        .skill-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 3px solid var(--secondary);
+            transition: transform 0.2s;
+        }
+ 
+        .skill-card:hover {
+            transform: translateY(-5px);
+        }
+ 
+        .skill-header {
+            color: var(--text-white);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+ 
+        /* --- EXPERIENCE TIMELINE --- */
+        .job-card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            position: relative;
+        }
+ 
+        .job-title {
+            color: var(--text-white);
+            font-size: 1.4rem;
+        }
+ 
+        .job-company {
+            color: var(--secondary);
+            font-family: 'Courier New', monospace;
+            margin-bottom: 10px;
+            display: block;
+        }
+ 
+        .job-date {
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: block;
+            color: var(--text-light);
+            font-style: italic;
+        }
+ 
+        .job-details li {
+            margin-bottom: 8px;
+            margin-left: 20px;
+            list-style-type: square;
+        }
+ 
+        /* --- FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(100, 255, 218, 0.1);
+        }
+ 
+        .contact-info a {
+            color: var(--secondary);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+ 
+        /* --- MOBILE RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .hero, section { padding: 50px 25px; }
+            .hero h1 { font-size: 2.5rem; }
+            nav { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+ 
+    <nav>
+        <div class="logo">&lt;Gabriel/&gt;</div>
+        <div>
+            </div>
+    </nav>
+ 
+    <div class="hero">
+        <p class="terminal-text">Hi, my name is</p>
+        <h1>Gabriel Cubillan.</h1>
+        <h2>I break software to build it better.</h2>
+        <p style="max-width: 500px; margin-top: 20px;">
+            I am a Quality Engineering Senior Analyst specializing in Manual Web Application Testing, Automation, and Defect Management. I have 6 years of experience ensuring deliverables meet the highest standards.
+        </p>
+        <a href="mailto:gabriel.d.cubillan@gmail.com" class="cta-btn">Get In Touch</a>
+    </div>
+ 
+    <section id="skills">
+        <h2 class="section-title">Technical Arsenal</h2>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <div class="skill-header">Core Testing</div>
+                <p>Functional, Smoke, Regression, Integration, Sanity, User Acceptance Testing</p>
+            </div>
+            <div class="skill-card">
+                <div class="skill-header">Automation & Tools</div>
+                <p>Selenium Web Driver, Playwright, Python Scripts, Macros, PowerBI</p>
+            </div>
+            <div class="skill-card">
+                <div class="skill-header">Management</div>
+                <p>Azure DevOps (Defect Logging), Test Plan Execution</p>
+            </div>
+             <div class="skill-card">
+                <div class="skill-header">Education</div>
+                <p>BS Information Technology<br><small>Christ the King College of Science & Technology</small></p>
+            </div>
+        </div>
+    </section>
+ 
+    <section id="experience">
+        <h2 class="section-title">Experience Logs</h2>
+ 
+        <div class="job-card">
+            <span class="job-title">Quality Engineer (Tester)</span>
+            <span class="job-company">@ Accenture (CIO - Corporate Data Analytics)</span>
+            <span class="job-date">Dec 2023 - Present</span>
+            <ul class="job-details">
+                <li>Validated metric data in 360value navigator PowerBI tools.</li>
+                <li>Logged defects in Microsoft Azure DevOps.</li>
+                <li>Tested metrics using Python scripts and Macros for data validation.</li>
+                <li>Documented execution evidence via screenshots.</li>
+            </ul>
+        </div>
+ 
+        <div class="job-card">
+            <span class="job-title">Configurator</span>
+            <span class="job-company">@ Accenture</span>
+            <span class="job-date">July 2023 - Nov 2023</span>
+            <ul class="job-details">
+                <li>Assigned to migrate accounts to a new version of the tool.</li>
+                <li>Validated Tool Data alignment and tracked status reports.</li>
+                <li>Scheduled meetings to assist users in completing required data actions.</li>
+            </ul>
+        </div>
+ 
+        <div class="job-card">
+            <span class="job-title">Functional Architect</span>
+            <span class="job-company">@ Accenture</span>
+            <span class="job-date">Nov 2022 - June 2023</span>
+            <ul class="job-details">
+                <li>Demoed tools and Process Configuration files to internal/external clients.</li>
+                <li>Analyzed logs, troubleshooted issues, and provided technical support.</li>
+                <li>Collaborated with POCs and SMEs to define baselines and deploy tool packages.</li>
+                <li>Assisted Project Managers in improving deployment processes.</li>
+            </ul>
+        </div>
+ 
+        <div class="job-card">
+            <span class="job-title">Functional Manual Tester</span>
+            <span class="job-company">@ Accenture (Banking Sector)</span>
+            <span class="job-date">July 2017 - Oct 2022</span>
+            <ul class="job-details">
+                <li>5+ years of experience in Banking sector testing.</li>
+                <li>Executed functional test plans, scripts, cases, and conditions.</li>
+                <li>Automated testing using Selenium Web Driver.</li>
+                <li>Designed expected results for software usability and defect reporting.</li>
+            </ul>
+        </div>
+ 
+    </section>
+ 
+    <footer>
+        <p>Designed & Built by Gabriel Cubillan</p>
+        <div class="contact-info">
+            <p>Manila, Philippines | +63 9928379442</p>
+            <a href="mailto:gabriel.d.cubillan@gmail.com">gabriel.d.cubillan@gmail.com</a>
+        </div>
+    </footer>
+ 
+</body>
+</html>
