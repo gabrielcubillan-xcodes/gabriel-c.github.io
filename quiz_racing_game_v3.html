@@ -1,0 +1,621 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font-sans);}
+
+#bg-canvas{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+#app{position:relative;z-index:1;padding:1.25rem;min-height:600px;}
+
+.screen{display:none;}.screen.active{display:block;}
+h1{font-size:22px;font-weight:500;color:#fff;margin-bottom:4px;text-shadow:0 1px 4px rgba(0,0,0,.4);}
+h2{font-size:18px;font-weight:500;color:#fff;margin-bottom:4px;text-shadow:0 1px 3px rgba(0,0,0,.3);}
+h3{font-size:15px;font-weight:500;color:#fff;}
+p{font-size:14px;color:rgba(255,255,255,.8);line-height:1.6;}
+
+.card{background:rgba(255,255,255,.13);border:0.5px solid rgba(255,255,255,.25);border-radius:var(--border-radius-lg);padding:1.1rem 1.25rem;margin-bottom:1rem;backdrop-filter:blur(6px);}
+.card-solid{background:rgba(10,14,40,.72);border:0.5px solid rgba(255,255,255,.18);border-radius:var(--border-radius-lg);padding:1.1rem 1.25rem;margin-bottom:1rem;backdrop-filter:blur(8px);}
+
+.btn{display:inline-block;padding:8px 18px;border:0.5px solid rgba(255,255,255,.3);border-radius:var(--border-radius-md);font-size:14px;font-weight:500;cursor:pointer;background:rgba(255,255,255,.15);color:#fff;transition:background 0.12s;}
+.btn:hover{background:rgba(255,255,255,.25);}
+.btn:active{transform:scale(0.98);}
+.btn-primary{background:#185FA5;color:#fff;border-color:#378ADD;}
+.btn-primary:hover{background:#0C447C;}
+.btn-danger{background:rgba(163,45,45,.7);color:#fff;border-color:#F09595;}
+
+input[type=text]{width:100%;font-size:14px;padding:8px 12px;border:0.5px solid rgba(255,255,255,.35);border-radius:var(--border-radius-md);background:rgba(255,255,255,.12);color:#fff;outline:none;}
+input[type=text]::placeholder{color:rgba(255,255,255,.5);}
+input:focus{box-shadow:0 0 0 2px #378ADD88;border-color:#378ADD;}
+
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 8px;border-radius:var(--border-radius-md);}
+.badge-blue{background:#0C447C;color:#B5D4F4;}
+.badge-green{background:#27500A;color:#C0DD97;}
+.badge-red{background:#791F1F;color:#F7C1C1;}
+.badge-amber{background:#633806;color:#FAC775;}
+.badge-gray{background:rgba(255,255,255,.15);color:#fff;}
+.badge-white{background:rgba(255,255,255,.2);color:#fff;}
+
+.player-chip{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border-radius:var(--border-radius-md);padding:6px 10px;margin-bottom:5px;}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;flex-shrink:0;border:1.5px solid rgba(255,255,255,.3);}
+
+.track-wrap{background:rgba(0,0,0,.35);border-radius:var(--border-radius-lg);padding:10px 12px;margin:8px 0;max-height:380px;overflow-y:auto;}
+.racer-row{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.racer-name{font-size:12px;font-weight:500;min-width:72px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.track-bar{flex:1;height:18px;background:rgba(255,255,255,.1);border-radius:9px;position:relative;overflow:hidden;border:0.5px solid rgba(255,255,255,.15);}
+.track-fill{height:100%;border-radius:9px;transition:width 0.6s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:5px;}
+.pos-num{min-width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0;}
+
+.opt-btn{width:100%;text-align:left;padding:10px 14px;border:1px solid rgba(255,255,255,.25);border-radius:var(--border-radius-md);font-size:14px;cursor:pointer;background:rgba(255,255,255,.1);color:#fff;margin-bottom:7px;transition:background 0.12s,border-color 0.12s;}
+.opt-btn:hover{background:rgba(255,255,255,.2);}
+.opt-btn.correct{background:rgba(39,80,10,.85);border-color:#97C459;color:#C0DD97;}
+.opt-btn.wrong{background:rgba(163,45,45,.75);border-color:#F09595;color:#F7C1C1;}
+.opt-btn:disabled{cursor:default;}
+
+.timer-bar-wrap{background:rgba(255,255,255,.12);border-radius:4px;height:7px;margin-bottom:12px;overflow:hidden;}
+.timer-bar{height:100%;border-radius:4px;background:#378ADD;transition:width 1s linear;}
+
+.answer-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid rgba(255,255,255,.12);font-size:13px;}
+.answer-row:last-child{border-bottom:none;}
+
+.podium-wrap{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:14px 0;}
+.podium-block{text-align:center;}
+.podium-stand{border-radius:6px 6px 0 0;}
+.podium-name{font-size:13px;font-weight:500;color:#fff;margin-top:5px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.leaderboard-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:0.5px solid rgba(255,255,255,.12);}
+.leaderboard-row:last-child{border-bottom:none;}
+
+.car-pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.car-opt{border:1.5px solid rgba(255,255,255,.2);border-radius:var(--border-radius-md);padding:10px 6px;text-align:center;cursor:pointer;transition:border-color 0.12s,background 0.12s;background:rgba(255,255,255,.08);}
+.car-opt.selected{border-color:#378ADD;background:rgba(55,138,221,.25);}
+.car-opt:hover{border-color:rgba(255,255,255,.5);background:rgba(255,255,255,.15);}
+.car-opt .ce{font-size:22px;display:block;margin-bottom:3px;}
+.car-opt .cl{font-size:12px;font-weight:500;color:#fff;}
+.car-opt .cs{font-size:11px;color:rgba(255,255,255,.6);}
+
+.section-lbl{font-size:12px;font-weight:500;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 6px;}
+.flash{animation:fi 0.3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+.player-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:280px;overflow-y:auto;}
+
+.info-strip{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.info-pill{background:rgba(255,255,255,.15);border:0.5px solid rgba(255,255,255,.25);border-radius:20px;padding:5px 14px;font-size:13px;font-weight:500;color:#fff;}
+
+.q-recap-item{padding:6px 0;border-bottom:0.5px solid rgba(255,255,255,.12);font-size:13px;}
+.q-recap-item:last-child{border-bottom:none;}
+</style>
+
+<canvas id="bg-canvas"></canvas>
+<div id="app">
+
+<!-- LOBBY -->
+<div id="s-lobby" class="screen active">
+  <div style="text-align:center;padding:.5rem 0 1.1rem;">
+    <div style="font-size:42px;margin-bottom:6px;">🏁</div>
+    <h1>Quiz Grand Prix</h1>
+    <p>Answer correctly to race ahead — 50 questions, 10 seconds each. Up to 30 players!</p>
+  </div>
+
+  <div class="info-strip">
+    <div class="info-pill">🧩 General Knowledge</div>
+    <div class="info-pill">❓ 50 Questions</div>
+    <div class="info-pill">⏱ 10s per question</div>
+    <div class="info-pill">👥 Max 30 players</div>
+  </div>
+
+  <div class="card-solid">
+    <h3 style="margin-bottom:10px;">Register to race</h3>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input type="text" id="name-inp" placeholder="Enter your name..." maxlength="14"/>
+      <button class="btn btn-primary" onclick="addPlayer()">Join</button>
+    </div>
+    <p id="lobby-msg" style="font-size:12px;margin-bottom:8px;min-height:16px;"></p>
+    <div class="section-lbl">Registered players (<span id="p-count">0</span>/30)</div>
+    <div class="player-grid" id="player-list"><p style="font-size:13px;color:rgba(255,255,255,.5);grid-column:span 2;">No players yet...</p></div>
+  </div>
+
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+    <button class="btn btn-primary" id="start-btn" onclick="goCarSelect()" disabled>Start race →</button>
+    <p style="font-size:13px;margin:0;">Need at least 2 players</p>
+  </div>
+</div>
+
+<!-- CAR SELECT -->
+<div id="s-cars" class="screen">
+  <h2 style="margin-bottom:2px;">Choose your car</h2>
+  <p id="car-sub" style="margin-bottom:10px;">Player 1: pick your ride</p>
+  <div class="car-pick-grid" id="car-grid"></div>
+  <div class="card-solid" style="margin-top:12px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div><h3 id="car-stat-name">—</h3><div style="font-size:12px;color:rgba(255,255,255,.6);margin-top:3px;" id="car-stat-desc"></div></div>
+      <button class="btn btn-primary" id="confirm-car" onclick="confirmCar()" disabled>Confirm →</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUESTION -->
+<div id="s-question" class="screen">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;flex-wrap:wrap;gap:6px;">
+    <div>
+      <h2 id="q-title">Question 1</h2>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;">
+      <span class="badge badge-white" id="q-num-badge"></span>
+      <span class="badge badge-amber" id="timer-txt" style="font-size:14px;min-width:34px;text-align:center;"></span>
+    </div>
+  </div>
+  <div class="timer-bar-wrap"><div class="timer-bar" id="timer-bar" style="width:100%;"></div></div>
+  <div class="card-solid">
+    <p id="q-text" style="font-size:15px;font-weight:500;color:#fff;margin-bottom:14px;line-height:1.5;"></p>
+    <div id="opts"></div>
+  </div>
+  <div id="reveal-card" style="display:none;" class="card-solid">
+    <div class="section-lbl">Round results — next in <span id="next-cd">3</span>s</div>
+    <div id="answer-rows" style="max-height:140px;overflow-y:auto;"></div>
+  </div>
+  <div>
+    <div class="section-lbl">Live standings</div>
+    <div class="track-wrap"><div id="race-track"></div></div>
+  </div>
+  <div style="margin-top:8px;"><button class="btn btn-danger" onclick="resetGame()">Restart</button></div>
+</div>
+
+<!-- RESULTS -->
+<div id="s-results" class="screen">
+  <div style="text-align:center;padding:.75rem 0 1rem;">
+    <div style="font-size:36px;margin-bottom:6px;">🏆</div>
+    <h1>Race over!</h1>
+    <p id="res-sub"></p>
+  </div>
+  <div class="podium-wrap" id="podium"></div>
+  <div class="card-solid">
+    <div class="section-lbl">Final leaderboard</div>
+    <div id="final-lb" style="max-height:300px;overflow-y:auto;"></div>
+  </div>
+  <div class="card-solid">
+    <div class="section-lbl">Question recap</div>
+    <div id="q-recap" style="max-height:220px;overflow-y:auto;"></div>
+  </div>
+  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-primary" onclick="resetGame()">Play again ↺</button>
+    <button class="btn" onclick="sendPrompt('Give me 20 more general knowledge trivia questions with 4 options each and the correct answer index!')">More questions ↗</button>
+  </div>
+</div>
+</div>
+
+<script>
+const CARS=[
+  {id:'bolt',emoji:'⚡',label:'Lightning Bolt',desc:'Fast & electric'},
+  {id:'roar',emoji:'🏎️',label:'Roar GT',desc:'Classic racer'},
+  {id:'ghost',emoji:'👻',label:'Ghost Rider',desc:'Sneaky & quick'},
+  {id:'tank',emoji:'🛻',label:'Tank Pro',desc:'Steady & reliable'},
+  {id:'rocket',emoji:'🚀',label:'Rocket X',desc:'Extreme speed'},
+  {id:'fox',emoji:'🦊',label:'Fox Turbo',desc:'Cunning & agile'}
+];
+
+const PCOLORS=[
+  '#185FA5','#A32D2D','#27500A','#854F0B','#534AB7','#0F6E56',
+  '#D85A30','#D4537E','#378ADD','#639922','#BA7517','#E24B4A',
+  '#7F77DD','#1D9E75','#D85A30','#993556','#3B6D11','#185FA5',
+  '#A32D2D','#27500A','#854F0B','#534AB7','#0F6E56','#D4537E',
+  '#639922','#BA7517','#7F77DD','#1D9E75','#993556','#3B6D11'
+];
+
+const ALL_QUESTIONS=[
+  {q:"What is the capital city of France?",opts:["Berlin","Madrid","Paris","Rome"],ans:2},
+  {q:"How many sides does a hexagon have?",opts:["5","6","7","8"],ans:1},
+  {q:"Which planet is known as the Red Planet?",opts:["Venus","Jupiter","Mars","Saturn"],ans:2},
+  {q:"What is the largest ocean on Earth?",opts:["Atlantic","Indian","Arctic","Pacific"],ans:3},
+  {q:"Who painted the Mona Lisa?",opts:["Van Gogh","Da Vinci","Picasso","Rembrandt"],ans:1},
+  {q:"How many continents are there on Earth?",opts:["5","6","7","8"],ans:2},
+  {q:"What is the chemical symbol for gold?",opts:["Go","Gd","Au","Ag"],ans:2},
+  {q:"Which is the largest mammal in the world?",opts:["Elephant","Blue whale","Giraffe","Shark"],ans:1},
+  {q:"What language has the most native speakers?",opts:["English","Spanish","Mandarin","Hindi"],ans:2},
+  {q:"How many bones does an adult human body have?",opts:["186","206","226","246"],ans:1},
+  {q:"What is the speed of light approximately?",opts:["300,000 km/s","150,000 km/s","500,000 km/s","100,000 km/s"],ans:0},
+  {q:"What is H2O commonly known as?",opts:["Hydrogen","Oxygen","Water","Salt"],ans:2},
+  {q:"What planet is closest to the Sun?",opts:["Venus","Earth","Mercury","Mars"],ans:2},
+  {q:"What gas do plants absorb during photosynthesis?",opts:["Oxygen","Nitrogen","CO2","Hydrogen"],ans:2},
+  {q:"What is the powerhouse of the cell?",opts:["Nucleus","Ribosome","Mitochondria","Golgi body"],ans:2},
+  {q:"In which year did World War II end?",opts:["1943","1944","1945","1946"],ans:2},
+  {q:"Who was the first US President?",opts:["Lincoln","Jefferson","Washington","Adams"],ans:2},
+  {q:"Which empire built the Colosseum?",opts:["Greek","Ottoman","Roman","Byzantine"],ans:2},
+  {q:"In what year did the Berlin Wall fall?",opts:["1987","1989","1991","1993"],ans:1},
+  {q:"Who was the first person to walk on the Moon?",opts:["Buzz Aldrin","Yuri Gagarin","Neil Armstrong","John Glenn"],ans:2},
+  {q:"What is the longest river in the world?",opts:["Amazon","Congo","Nile","Yangtze"],ans:2},
+  {q:"What is the smallest country in the world?",opts:["Monaco","San Marino","Vatican City","Liechtenstein"],ans:2},
+  {q:"What is the tallest mountain in the world?",opts:["K2","Kangchenjunga","Everest","Lhotse"],ans:2},
+  {q:"Which sport uses a shuttlecock?",opts:["Tennis","Squash","Badminton","Polo"],ans:2},
+  {q:"What is the maximum score in ten-pin bowling?",opts:["200","250","300","350"],ans:2},
+  {q:"What is the hardest natural substance on Earth?",opts:["Gold","Iron","Diamond","Quartz"],ans:2},
+  {q:"How many players are on a basketball team on court?",opts:["4","5","6","7"],ans:1},
+  {q:"What force keeps planets in orbit?",opts:["Magnetism","Friction","Gravity","Electricity"],ans:2},
+  {q:"What is the capital of Australia?",opts:["Sydney","Melbourne","Brisbane","Canberra"],ans:3},
+  {q:"Which country has the most natural lakes?",opts:["USA","Russia","Brazil","Canada"],ans:3},
+  {q:"How many teeth does an adult human have?",opts:["28","30","32","34"],ans:2},
+  {q:"What is the square root of 144?",opts:["10","11","12","13"],ans:2},
+  {q:"Which animal is known as the king of the jungle?",opts:["Tiger","Cheetah","Lion","Leopard"],ans:2},
+  {q:"How many strings does a standard guitar have?",opts:["4","5","6","7"],ans:2},
+  {q:"What is the capital of Japan?",opts:["Osaka","Kyoto","Hiroshima","Tokyo"],ans:3},
+  {q:"How many colors are in a rainbow?",opts:["5","6","7","8"],ans:2},
+  {q:"Which planet has the most moons?",opts:["Jupiter","Saturn","Uranus","Neptune"],ans:1},
+  {q:"What year was the first iPhone released?",opts:["2005","2006","2007","2008"],ans:2},
+  {q:"What is the capital of Brazil?",opts:["Rio de Janeiro","São Paulo","Brasília","Salvador"],ans:2},
+  {q:"What sport is played at Wimbledon?",opts:["Cricket","Tennis","Golf","Polo"],ans:1},
+  {q:"How many hours are in a week?",opts:["148","158","168","178"],ans:2},
+  {q:"What element does 'O' represent on the periodic table?",opts:["Osmium","Gold","Oxygen","Oganesson"],ans:2},
+  {q:"Who wrote Romeo and Juliet?",opts:["Dickens","Chaucer","Shakespeare","Austen"],ans:2},
+  {q:"What is the largest planet in our solar system?",opts:["Saturn","Uranus","Neptune","Jupiter"],ans:3},
+  {q:"How many days are in a leap year?",opts:["364","365","366","367"],ans:2},
+  {q:"What is the currency of Japan?",opts:["Won","Yuan","Ringgit","Yen"],ans:3},
+  {q:"Which ocean is the smallest?",opts:["Indian","Atlantic","Arctic","Southern"],ans:2},
+  {q:"What gas makes up most of Earth's atmosphere?",opts:["Oxygen","CO2","Nitrogen","Argon"],ans:2},
+  {q:"How many sides does a pentagon have?",opts:["4","5","6","7"],ans:1},
+  {q:"What is the capital of Canada?",opts:["Toronto","Vancouver","Montreal","Ottawa"],ans:3}
+];
+
+const TIMERFIX=10, TOTALQ=50, MAXPLAYERS=30, REVEAL_DELAY=3;
+let players=[], carSelectIdx=0, selectedCar=null;
+let raceState=[], questions=[], currentQ=0;
+let questionTimer=null, revealTimer=null, answerLocked=false;
+const BOOST=2;
+
+function addPlayer(){
+  const inp=document.getElementById('name-inp');
+  const name=inp.value.trim();
+  if(!name){showMsg('Enter a name!','#F09595');return;}
+  if(players.find(p=>p.name.toLowerCase()===name.toLowerCase())){showMsg('Name already taken!','#F09595');return;}
+  if(players.length>=MAXPLAYERS){showMsg('Max 30 players reached!','#F09595');return;}
+  players.push({name,color:PCOLORS[players.length%PCOLORS.length],car:null});
+  inp.value='';
+  renderLobby();
+  updateStartBtn();
+  showMsg(name+' joined the race! 🎉','#C0DD97');
+}
+
+function removePlayer(i){players.splice(i,1);renderLobby();updateStartBtn();}
+
+function renderLobby(){
+  document.getElementById('p-count').textContent=players.length;
+  const el=document.getElementById('player-list');
+  if(!players.length){el.innerHTML='<p style="font-size:13px;color:rgba(255,255,255,.5);grid-column:span 2;">No players yet...</p>';return;}
+  el.innerHTML=players.map((p,i)=>`<div class="player-chip flash">
+    <div class="avatar" style="background:${p.color}">${p.name.slice(0,2).toUpperCase()}</div>
+    <span style="flex:1;font-size:13px;font-weight:500;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</span>
+    <button class="btn btn-danger" style="padding:2px 7px;font-size:11px;flex-shrink:0;" onclick="removePlayer(${i})">✕</button>
+  </div>`).join('');
+}
+
+function showMsg(msg,color){
+  const el=document.getElementById('lobby-msg');
+  el.textContent=msg;el.style.color=color;
+  setTimeout(()=>{el.textContent='';},2500);
+}
+
+function updateStartBtn(){document.getElementById('start-btn').disabled=players.length<2;}
+
+function goCarSelect(){
+  questions=[...ALL_QUESTIONS].sort(()=>Math.random()-0.5).slice(0,TOTALQ);
+  carSelectIdx=0;selectedCar=null;
+  showCarFor(0);showScreen('s-cars');
+}
+
+function showCarFor(i){
+  document.getElementById('car-sub').textContent=players[i].name+': pick your ride';
+  document.getElementById('car-stat-name').textContent='—';
+  document.getElementById('car-stat-desc').textContent='';
+  document.getElementById('confirm-car').disabled=true;
+  selectedCar=null;
+  const taken=players.slice(0,i).map(p=>p.car?.id);
+  document.getElementById('car-grid').innerHTML=CARS.map(c=>{
+    const tk=taken.includes(c.id);
+    return `<div class="car-opt" id="co-${c.id}" onclick="${tk?'':'pickCar(\''+c.id+'\')'}" style="${tk?'opacity:.3;cursor:not-allowed;':''}">
+      <span class="ce">${c.emoji}</span>
+      <div class="cl">${c.label}</div>
+      <div class="cs">${c.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+function pickCar(id){
+  selectedCar=CARS.find(c=>c.id===id);
+  document.querySelectorAll('.car-opt').forEach(e=>e.classList.remove('selected'));
+  document.getElementById('co-'+id).classList.add('selected');
+  document.getElementById('car-stat-name').textContent=selectedCar.emoji+' '+selectedCar.label;
+  document.getElementById('car-stat-desc').textContent=selectedCar.desc;
+  document.getElementById('confirm-car').disabled=false;
+}
+
+function confirmCar(){
+  if(!selectedCar)return;
+  players[carSelectIdx].car=selectedCar;
+  carSelectIdx++;
+  if(carSelectIdx>=players.length){initRace();}
+  else{showCarFor(carSelectIdx);}
+}
+
+function initRace(){
+  raceState=players.map(p=>({
+    name:p.name,color:p.color,car:p.car,
+    progress:0,score:0,lastAnswer:null,wasCorrect:false
+  }));
+  currentQ=-1;
+  showScreen('s-question');
+  nextQuestion();
+}
+
+function nextQuestion(){
+  clearAllTimers();
+  currentQ++;
+  if(currentQ>=questions.length){showResults();return;}
+  answerLocked=false;
+  raceState.forEach(r=>{r.lastAnswer=null;r.wasCorrect=false;});
+  document.getElementById('reveal-card').style.display='none';
+
+  const q=questions[currentQ];
+  document.getElementById('q-title').textContent='Question '+(currentQ+1);
+  document.getElementById('q-num-badge').textContent=(currentQ+1)+' / '+questions.length;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('opts').innerHTML=q.opts.map((o,i)=>
+    `<button class="opt-btn" id="opt-${i}" onclick="playerAnswer(${i})">${String.fromCharCode(65+i)}. ${o}</button>`
+  ).join('');
+  renderTrack();
+  startQuestionTimer();
+}
+
+let timerVal=0;
+function startQuestionTimer(){
+  timerVal=TIMERFIX;
+  document.getElementById('timer-bar').style.transition='none';
+  document.getElementById('timer-bar').style.width='100%';
+  document.getElementById('timer-bar').style.background='#378ADD';
+  document.getElementById('timer-txt').textContent=timerVal+'s';
+  setTimeout(()=>{document.getElementById('timer-bar').style.transition='width 1s linear';},30);
+
+  questionTimer=setInterval(()=>{
+    timerVal--;
+    const pct=Math.max((timerVal/TIMERFIX)*100,0);
+    document.getElementById('timer-bar').style.width=pct+'%';
+    if(timerVal<=3)document.getElementById('timer-bar').style.background='#E24B4A';
+    document.getElementById('timer-txt').textContent=timerVal+'s';
+    if(timerVal<=0){clearInterval(questionTimer);lockAndReveal();}
+  },1000);
+}
+
+function playerAnswer(idx){
+  if(answerLocked)return;
+  clearInterval(questionTimer);
+  const correct=idx===questions[currentQ].ans;
+  raceState.forEach(r=>{
+    r.lastAnswer=idx;r.wasCorrect=correct;
+    if(correct){r.progress=Math.min(r.progress+BOOST,100);r.score++;}
+  });
+  highlightAnswer(idx,questions[currentQ].ans);
+  answerLocked=true;
+  renderTrack();
+  showRevealAndScheduleNext();
+}
+
+function lockAndReveal(){
+  if(answerLocked)return;
+  answerLocked=true;
+  highlightAnswer(-1,questions[currentQ].ans);
+  showRevealAndScheduleNext();
+}
+
+function highlightAnswer(chosen,correct){
+  questions[currentQ].opts.forEach((_,i)=>{
+    const btn=document.getElementById('opt-'+i);
+    if(!btn)return;
+    btn.disabled=true;
+    if(i===correct)btn.classList.add('correct');
+    else if(i===chosen)btn.classList.add('wrong');
+  });
+}
+
+function showRevealAndScheduleNext(){
+  document.getElementById('reveal-card').style.display='block';
+  const sorted=[...raceState].sort((a,b)=>b.score-a.score);
+  document.getElementById('answer-rows').innerHTML=sorted.map(r=>{
+    let icon='—';let st='color:rgba(255,255,255,.5)';
+    if(r.wasCorrect){icon='✓';st='color:#C0DD97;font-weight:500';}
+    else if(r.lastAnswer!==null){icon='✗';st='color:#F7C1C1';}
+    return `<div class="answer-row">
+      <span style="font-size:15px;">${r.car.emoji}</span>
+      <span style="flex:1;font-weight:500;color:${r.color};font-size:13px;">${r.name}</span>
+      <span style="${st};font-size:14px;">${icon}</span>
+      <span class="badge badge-gray">${r.score} pts</span>
+    </div>`;
+  }).join('');
+
+  let cd=REVEAL_DELAY;
+  document.getElementById('next-cd').textContent=cd;
+  revealTimer=setInterval(()=>{
+    cd--;
+    document.getElementById('next-cd').textContent=cd;
+    if(cd<=0){clearInterval(revealTimer);nextQuestion();}
+  },1000);
+}
+
+function renderTrack(){
+  const sorted=[...raceState].sort((a,b)=>b.progress-a.progress);
+  const posColors=['#378ADD','#1D9E75','#BA7517','#888780'];
+  document.getElementById('race-track').innerHTML=sorted.map((r,i)=>{
+    const pct=r.progress;
+    const pc=posColors[Math.min(i,3)];
+    return `<div class="racer-row">
+      <div class="pos-num" style="background:${pc}33;color:${pc};border:1px solid ${pc}66;">${i+1}</div>
+      <div class="racer-name" style="color:${r.color}">${r.name}</div>
+      <div class="track-bar">
+        <div class="track-fill" style="width:${pct}%;background:${r.color};">
+          ${pct>6?`<span style="font-size:12px;">${r.car.emoji}</span>`:''}
+        </div>
+      </div>
+      <span style="font-size:11px;color:rgba(255,255,255,.6);margin-left:4px;min-width:28px;text-align:right;">${r.score}pts</span>
+    </div>`;
+  }).join('');
+}
+
+function showResults(){
+  clearAllTimers();
+  const sorted=[...raceState].sort((a,b)=>b.score-a.score||b.progress-a.progress);
+  document.getElementById('res-sub').textContent=sorted[0].name+' wins with '+sorted[0].score+' correct answers!';
+  const medals=['🥇','🥈','🥉'];
+  const podH=[110,80,60];const podC=['#FAC775','#D3D1C7','#F0997B'];
+  const podOrder=[sorted[1],sorted[0],sorted[2]].filter(Boolean);
+  const podPos=[2,1,3];
+  document.getElementById('podium').innerHTML=podOrder.map((r,i)=>`
+    <div class="podium-block">
+      <div style="font-size:22px;margin-bottom:3px;">${r.car.emoji}</div>
+      <div style="font-size:20px;">${medals[sorted.indexOf(r)]||''}</div>
+      <div class="podium-stand" style="width:76px;height:${podH[i]}px;background:${podC[i]};"></div>
+      <div class="podium-name">${r.name}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.6)">P${podPos[i]} · ${r.score}pts</div>
+    </div>`).join('');
+  document.getElementById('final-lb').innerHTML=sorted.map((r,i)=>`
+    <div class="leaderboard-row">
+      <span style="font-size:15px;">${medals[i]||'#'+(i+1)}</span>
+      <span style="font-size:15px;">${r.car.emoji}</span>
+      <span style="flex:1;font-size:13px;font-weight:500;color:${r.color}">${r.name}</span>
+      <span class="badge badge-blue">${r.score}/${questions.length}</span>
+    </div>`).join('');
+  document.getElementById('q-recap').innerHTML=questions.map((q,i)=>`
+    <div class="q-recap-item">
+      <div style="font-weight:500;color:#fff;margin-bottom:2px;">Q${i+1}. ${q.q}</div>
+      <div style="color:#C0DD97;font-size:12px;">✓ ${q.opts[q.ans]}</div>
+    </div>`).join('');
+  showScreen('s-results');
+}
+
+function clearAllTimers(){clearInterval(questionTimer);clearInterval(revealTimer);}
+
+function resetGame(){
+  clearAllTimers();
+  players=[];raceState=[];currentQ=-1;
+  renderLobby();updateStartBtn();
+  showScreen('s-lobby');
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+document.getElementById('name-inp').addEventListener('keydown',e=>{if(e.key==='Enter')addPlayer();});
+
+const canvas=document.getElementById('bg-canvas');
+const ctx=canvas.getContext('2d');
+let stars=[], meteors=[], roadLines=[];
+let W,H;
+
+function resize(){
+  W=canvas.width=canvas.offsetWidth;
+  H=canvas.height=canvas.parentElement.scrollHeight||800;
+  canvas.height=Math.max(H,600);
+}
+
+function initStars(){
+  stars=[];
+  for(let i=0;i<120;i++){
+    stars.push({x:Math.random()*W,y:Math.random()*H*0.6,r:Math.random()*1.5+0.3,a:Math.random(),da:Math.random()*.015+.005});
+  }
+}
+
+function initMeteors(){
+  meteors=[];
+  for(let i=0;i<4;i++) spawnMeteor();
+}
+
+function spawnMeteor(){
+  meteors.push({x:Math.random()*W*1.2,y:-20,vx:-2.5-Math.random()*2,vy:1.5+Math.random()*1.5,len:80+Math.random()*60,a:1});
+}
+
+function initRoad(){
+  roadLines=[];
+  for(let i=0;i<12;i++){
+    roadLines.push({y:H*0.65+i*(H*0.35/12)*2.5,speed:2+i*0.4,w:20+i*8});
+  }
+}
+
+let frame=0;
+function drawBg(){
+  ctx.clearRect(0,0,W,H);
+
+  const grad=ctx.createLinearGradient(0,0,0,H);
+  grad.addColorStop(0,'#04081a');
+  grad.addColorStop(0.55,'#0a1535');
+  grad.addColorStop(0.72,'#0d1a12');
+  grad.addColorStop(1,'#111');
+  ctx.fillStyle=grad;
+  ctx.fillRect(0,0,W,H);
+
+  stars.forEach(s=>{
+    s.a+=s.da;
+    if(s.a>1||s.a<0.1)s.da*=-1;
+    ctx.beginPath();
+    ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    ctx.fillStyle=`rgba(255,255,255,${s.a.toFixed(2)})`;
+    ctx.fill();
+  });
+
+  meteors.forEach((m,i)=>{
+    ctx.beginPath();
+    ctx.moveTo(m.x,m.y);
+    ctx.lineTo(m.x-m.vx*m.len/3,m.y-m.vy*m.len/3);
+    ctx.strokeStyle=`rgba(200,220,255,${m.a*0.7})`;
+    ctx.lineWidth=1.5;
+    ctx.stroke();
+    m.x+=m.vx;m.y+=m.vy;m.a-=0.008;
+    if(m.a<=0||m.y>H*0.55){meteors[i]=null;setTimeout(spawnMeteor,2000+Math.random()*4000);}
+  });
+  meteors=meteors.filter(Boolean);
+
+  const roadTop=H*0.68;
+  const roadBot=H;
+  const rx=W/2;
+  ctx.beginPath();
+  ctx.moveTo(rx-80,roadTop);
+  ctx.lineTo(0,roadBot);
+  ctx.lineTo(W,roadBot);
+  ctx.lineTo(rx+80,roadTop);
+  ctx.closePath();
+  ctx.fillStyle='#1a1a2e';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(rx-80,roadTop);
+  ctx.lineTo(0,roadBot);
+  ctx.strokeStyle='rgba(255,200,0,.45)';
+  ctx.lineWidth=2;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(rx+80,roadTop);
+  ctx.lineTo(W,roadBot);
+  ctx.strokeStyle='rgba(255,200,0,.45)';
+  ctx.stroke();
+
+  roadLines.forEach(l=>{
+    l.y+=l.speed;
+    if(l.y>H+20) l.y=roadTop+Math.random()*10;
+    const prog=(l.y-roadTop)/(H-roadTop);
+    const lx=rx;
+    const hw=l.w*prog*0.5;
+    ctx.beginPath();
+    ctx.rect(lx-hw/2,l.y,hw,6*prog+2);
+    ctx.fillStyle=`rgba(255,255,255,${0.15+prog*0.3})`;
+    ctx.fill();
+  });
+
+  const glowY=roadTop;
+  const grd=ctx.createRadialGradient(rx,glowY,0,rx,glowY,200);
+  grd.addColorStop(0,'rgba(24,95,165,0.18)');
+  grd.addColorStop(1,'rgba(0,0,0,0)');
+  ctx.fillStyle=grd;
+  ctx.fillRect(rx-200,glowY-60,400,260);
+
+  frame++;
+  requestAnimationFrame(drawBg);
+}
+
+window.addEventListener('resize',()=>{resize();initStars();initRoad();});
+resize();initStars();initMeteors();initRoad();drawBg();
+</script>
